@@ -6,12 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.beans.Transient;
 import java.io.IOException;
-import java.security.Security;
 
-import jakarta.transaction.TransactionScoped;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +24,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
+
+  // Because we need to deal with the database, we will need a bean (component) extends from Srping UserDetailsService
+  // This bean is created inside ApplicationConfig, which type is User
   private final UserDetailsService userDetailsService;
   private final TokenRepository tokenRepository;
 
@@ -44,20 +44,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String jwt;
     final String userEmail;
     if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+      // not authenticated, pass to the next filter
       filterChain.doFilter(request, response);
       return;
     }
     jwt = authHeader.substring(7);
     userEmail = jwtService.extractUsername(jwt);
+
+    // check if user is already authenticated inside SecurityContextHolder
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-      var isTokenValid = tokenRepository.findByToken(jwt)
+      // Load userDetails from the database, so we can compare it with the claim in JWT
+      final UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+      final var isTokenValid = tokenRepository.findByToken(jwt)
           .map(t -> !t.isExpired() && !t.isRevoked())
           .orElse(false);
       if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
             userDetails,
-            null,
+            null, // we do have credentials when creating user, so using it as null
             userDetails.getAuthorities()
         );
         authToken.setDetails(

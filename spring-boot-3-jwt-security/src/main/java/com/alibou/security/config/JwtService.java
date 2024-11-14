@@ -34,6 +34,7 @@ public class JwtService {
     return claimsResolver.apply(claims);
   }
 
+  /** A Token without any extra claims, use empty Hashmap */
   public String generateToken(UserDetails userDetails) {
     return generateToken(new HashMap<>(), userDetails);
   }
@@ -66,6 +67,7 @@ public class JwtService {
             .compact();
   }
 
+  /** Check if a token is valid corresponding to given userDetails that they claim */
   public boolean isTokenValid(String token, UserDetails userDetails) {
     final String username = extractUsername(token);
     return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -89,6 +91,7 @@ public class JwtService {
   }
 
   private Key getSignInKey() {
+    // Because the key is in Hex 256 bits, we need to convert it to Bytes
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
   }
