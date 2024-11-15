@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Instead of providing RequestMatcher inside SecurityConfiguration
+ * We can also annotate constroller directly with hasRole and hasAuthority
+ * Must decorate SpringConfiguration class with @EnableMethodSecurity (Spring 3.x)
+ * or @EnableGlobalMethodSecurity for Spring 2.x
+ */
 @RestController
 @RequestMapping("/api/v1/admin")
 @PreAuthorize("hasRole('ADMIN')")

@@ -20,7 +20,6 @@ import static com.alibou.security.user.Permission.MANAGER_UPDATE;
 
 @RequiredArgsConstructor
 public enum Role {
-
   USER(Collections.emptySet()),
   ADMIN(
           Set.of(
@@ -41,18 +40,24 @@ public enum Role {
                   MANAGER_DELETE,
                   MANAGER_CREATE
           )
-  )
+  );
 
-  ;
 
+  /**
+   * Because we have @RequiredArgsConstructor, we will have Role(Set<Permission> permissions)
+   * As a constructor.
+   * Therefore, we have ADMIN(Set<Permission>) or User(Set<Permission>) are setting the permissions
+   */
   @Getter
   private final Set<Permission> permissions;
 
   public List<SimpleGrantedAuthority> getAuthorities() {
-    var authorities = getPermissions()
+    final List<SimpleGrantedAuthority> authorities = getPermissions()
             .stream()
             .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
             .collect(Collectors.toList());
+
+    //Spring requires "ROLE_" prefix before the role name
     authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
     return authorities;
   }

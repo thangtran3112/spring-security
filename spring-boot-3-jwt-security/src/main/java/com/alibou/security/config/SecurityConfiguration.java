@@ -36,7 +36,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth/**",
+            "/api/v1/auth/**", // no business logics, only register/ login / logout
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -49,6 +49,8 @@ public class SecurityConfiguration {
             "/swagger-ui.html"};
     // name can be anything, but JwtAuthenticationFilter must extends Filter class, such as OncePerRequestFilter
     private final JwtAuthenticationFilter jwtAuthFilter;
+
+    // This bean is created in ApplicationConfig
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
