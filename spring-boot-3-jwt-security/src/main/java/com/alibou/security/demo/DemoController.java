@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/demo-controller")
-@Hidden
+@Hidden  // Hiding from Swagger Website
 public class DemoController {
 
   @GetMapping

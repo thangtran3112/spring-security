@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/management")
-@Tag(name = "Management")
+@Tag(name = "Management") // this is used for swagger to rename the section
 public class ManagementController {
 
 
